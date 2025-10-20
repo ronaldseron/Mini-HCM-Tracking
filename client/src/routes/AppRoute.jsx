@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import PublicRoute from './PublicRoute';
 import EmployeeRoute from './EmployeeRoute';
 import AdminRoute from './AdminRoute';
+import NotFound from '../pages/NotFound';
 
 // Public Pages
 import LandingPage from '../pages/public/LandingPage';
@@ -56,6 +57,7 @@ const AppRoute = () => {
       <Route path="/admin/reports" element={<AdminRoute><ReportPage /></AdminRoute>} />
 
       {/* Fallback */}
+      <Route path="/404" element={<NotFound />} />
       <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   );

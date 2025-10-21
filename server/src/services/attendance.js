@@ -32,15 +32,15 @@ export const punchOut = async (uid) => {
 
 export const getTodayRecords = async (uid) => {
    const record = await AttendanceRepo.getAttendanceByUserAndDate(uid);
-    console.log("Record", record);
 
    if (!record.exists) return null;
  
    const user = await UserRepo.getUserByUid(uid);
-   const schedule = user?.schedule || null;
+   const schedule = user?.schedule;
+   const timezone = user?.timezone;
  
    const { timeIn, timeOut } = record.data;
-   const metrics = await getMetricsStatus({ data: record.data, schedule });
+   const metrics = await getMetricsStatus({ data: record.data, schedule, timezone });
    const hms = convertMetricsToHMS(metrics);
  
    return {

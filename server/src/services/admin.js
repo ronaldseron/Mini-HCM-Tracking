@@ -17,7 +17,7 @@ export const getUsersWithWeeklySummary = async (limit, lastVisible) =>{
 } 
 
 export const editEmployeePunch = async (uid, punchId, updatedData) => {
-  const punch = await AdminRepo.updateEmployeePunch(punchId, updatedData);
+  const punch = await AdminRepo.updateEmployeePunch(uid, punchId, updatedData);
   const attendanceData = await AdminRepo.fetchEmployeeAttendanceById(uid, punch.id);
   const metrics = await getMetricsStatus(attendanceData);
   

@@ -1,9 +1,5 @@
 import admin from "../config/firebase.js";
-import {
-  usersCollection,
-  attendanceCollection,
-  dailySummaryCollection,
-} from "../config/db.js";
+import { usersCollection, attendanceCollection, dailySummaryCollection } from "../config/db.js";
 import { dateKey, getMondayAndFridayKeys } from "../utils/timeUtils.js";
 import { toTimestamp } from "../utils/formatUtils.js";
 import * as UserRepo from "../repositories/user.js";
@@ -52,6 +48,7 @@ export const updateEmployeePunch = async (uid, punchId, updatedData) => {
   const docRef = attendanceCollection.doc(punchId);
   const docSnap = await docRef.get();
   if (!docSnap.exists) return null;
+  
   const baseDate = docSnap.data().createdAt.toDate();
   const user = await UserRepo.getUserByUid(uid);
   const timezone = user?.timezone;
@@ -83,11 +80,10 @@ export const fetchEmployeeAttendanceById = async (uid, punchId) => {
   };
 };
 
-export const fetchAllUsersWithDailySummaries = async (
-  limitCount = 10,
-  lastVisibleId
-) => {
-  const todayStr = dateKey();
+export const fetchAllUsersWithDailySummaries = async (uid, limitCount = 10, lastVisibleId) => {
+  const timezoneUser = await UserRepo.getUserByUid(uid);
+  const timezone = timezoneUser?.timezone;
+  const todayStr = dateKey(timezone);
 
   let query = usersCollection
     .where("role", "==", "employee")
@@ -133,11 +129,10 @@ export const fetchAllUsersWithDailySummaries = async (
   };
 };
 
-export const fetchAllUsersWithWeeklySummaries = async (
-  limitCount = 10,
-  lastVisibleId
-) => {
-  const { mondayKey, fridayKey } = getMondayAndFridayKeys();
+export const fetchAllUsersWithWeeklySummaries = async (uid, limitCount = 10, lastVisibleId) => {
+  const timezoneUser = await UserRepo.getUserByUid(uid);
+  const timezone = timezoneUser?.timezone;
+  const { mondayKey, fridayKey } = getMondayAndFridayKeys(timezone);
 
   let query = usersCollection
     .where("role", "==", "employee")

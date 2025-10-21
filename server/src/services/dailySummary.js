@@ -9,9 +9,10 @@ export const createDailySummary = async (uid) => {
   if (!attendanceRecord.exists) return { message: "No attendance record found today." };
 
   const user = await UserRepo.getUserByUid(uid);
-  const schedule = user?.schedule || null;
+  const schedule = user?.schedule;
+  const timezone = user?.timezone;
 
-  const todayMetrics = await getMetricsStatus({ data: attendanceRecord.data, schedule });
+  const todayMetrics = await getMetricsStatus({ data: attendanceRecord.data, schedule, timezone });
 
   await DailySummaryRepo.createDailySummary(uid, todayMetrics);
 

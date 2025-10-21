@@ -6,25 +6,28 @@ export const toDate = (timestamp) => {
 export const toTimestamp = (timeStr, baseDate, admin, timezone) => {
   if (!timeStr) return null;
 
+  // Parse input time (e.g., "01:23:45 PM")
   const [time, modifier] = timeStr.split(" ");
   let [h, m, s] = time.split(":").map(Number);
   if (modifier === "PM" && h < 12) h += 12;
   if (modifier === "AM" && h === 12) h = 0;
 
-  const baseParts = new Date(baseDate).toLocaleDateString("en-US", { timeZone: timezone })
-    .split("/")
-    .map(Number);
-  const year = baseParts[2];
-  const month = baseParts[0] - 1;
-  const day = baseParts[1];
+  // Get base date components in user's timezone
+  const tzDateStr = baseDate.toLocaleString("en-US", { timeZone: timezone });
+  const tzDate = new Date(tzDateStr); // This is now the date in the user's TZ
+  const year = tzDate.getFullYear();
+  const month = tzDate.getMonth(); // 0-indexed
+  const day = tzDate.getDate();
 
-  const userTZDate = new Date(year, month, day, h, m, s || 0);
+  console.log("tzDateStr:", tzDateStr);
 
-  //UTC for Firestore
-  const utcDate = new Date(userTZDate.getTime() - userTZDate.getTimezoneOffset() * 60000);
+  // Build date in user's timezone
+  const userTZDate = new Date(Date.UTC(year, month, day, h, m, s || 0));
 
-  return admin.firestore.Timestamp.fromDate(utcDate);
+  // Convert it to UTC Firestore timestamp
+  return admin.firestore.Timestamp.fromDate(userTZDate);
 };
+
 
 
 

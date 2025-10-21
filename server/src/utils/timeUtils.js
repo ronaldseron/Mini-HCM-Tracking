@@ -1,7 +1,15 @@
-export const dateKey = () => {
+export const dateKey = (timezone) => {
   const now = new Date();
-  return now.toISOString().split("T")[0];
+  const formatted = new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+
+  return formatted;
 };
+
 
 export function timeToDecimal(timeString) {
   if (!timeString) return 0;
@@ -9,8 +17,13 @@ export function timeToDecimal(timeString) {
   return hours + minutes / 60 + seconds / 3600;
 }
 
-export function getMondayAndFridayKeys() {
-  const today = new Date();
+export function getMondayAndFridayKeys(userTimezone) {
+  const timezone = userTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const today = new Date(
+    new Date().toLocaleString("en-US", { timeZone: timezone })
+  );
+
   const day = today.getDay();
   const monday = new Date(today);
   const friday = new Date(today);
@@ -21,8 +34,9 @@ export function getMondayAndFridayKeys() {
   monday.setDate(today.getDate() + diffToMonday);
   friday.setDate(today.getDate() + diffToFriday);
 
-  const mondayKey = monday.toISOString().split("T")[0];
-  const fridayKey = friday.toISOString().split("T")[0];
+  const mondayKey = monday.toLocaleDateString("en-CA", { timeZone: timezone });
+  const fridayKey = friday.toLocaleDateString("en-CA", { timeZone: timezone });
 
   return { mondayKey, fridayKey };
 }
+

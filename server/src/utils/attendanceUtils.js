@@ -31,9 +31,25 @@ export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd, time
     tOut = h + m / 60 + s / 3600;
   }
 
+  // Late in hours
   const lateHours = Math.max(0, tIn - sStart);
-  const workedHours = Math.max(0, tOut - tIn);
 
+  // If timeOut is missing → calculate only regular and late
+  if (!timeOut) {
+    const hoursWorkedSoFar = Math.max(0, tOut - tIn);
+    const regularHours = Math.min(hoursWorkedSoFar, sEnd - sStart);
+
+    return {
+      regular: regularHours.toFixed(6),
+      overtime: "0.00",
+      undertime: "0.00",
+      late: lateHours.toFixed(6),
+      nightDifferential: "0.00",
+    };
+  }
+
+  // If timeOut exists → compute all metrics
+  const workedHours = Math.max(0, tOut - tIn);
   const regularHours = Math.min(workedHours, sEnd - sStart);
   const overtimeHours = tOut > sEnd ? tOut - sEnd : 0;
   const undertimeHours = tOut < sEnd ? sEnd - tOut : 0;

@@ -87,10 +87,11 @@ const sendPaginatedSummary = (res, dataObj) => {
 
 export const getUsersWithDailySummary = async (req, res) => {
   try {
+    const { uid } = req.user;
     const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 100);
     const lastVisible = req.query.lastVisible || null;
 
-    const dataObj = await AdminService.getUsersWithDailySummary(limit, lastVisible);
+    const dataObj = await AdminService.getUsersWithDailySummary(uid, limit, lastVisible);
 
     return sendPaginatedSummary(res, dataObj);
   } catch (error) {
@@ -102,10 +103,11 @@ export const getUsersWithDailySummary = async (req, res) => {
 
 export const getUsersWithWeeklySummary = async (req, res) => {
   try {
+    const { uid } = req.user;
     const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 100);
     const lastVisible = req.query.lastVisible || null;
 
-    const dataObj = await AdminService.getUsersWithWeeklySummary(limit, lastVisible);
+    const dataObj = await AdminService.getUsersWithWeeklySummary(uid, limit, lastVisible);
 
     return sendPaginatedSummary(res, dataObj);
   } catch (error) {

@@ -8,12 +8,12 @@ export const getAllEmployees = async (limit, lastVisible) => {
 
 export const getEmployeePunches = (uid) => AdminRepo.fetchEmployeePunches(uid);
 
-export const getUsersWithDailySummary = async (limit, lastVisible) => {
-  return await AdminRepo.fetchAllUsersWithDailySummaries(limit, lastVisible);
+export const getUsersWithDailySummary = async (uid, limit, lastVisible) => {
+  return await AdminRepo.fetchAllUsersWithDailySummaries(uid, limit, lastVisible);
 }
 
-export const getUsersWithWeeklySummary = async (limit, lastVisible) =>{
-  return await AdminRepo.fetchAllUsersWithWeeklySummaries(limit, lastVisible);
+export const getUsersWithWeeklySummary = async (uid, limit, lastVisible) =>{
+  return await AdminRepo.fetchAllUsersWithWeeklySummaries(uid, limit, lastVisible);
 } 
 
 export const editEmployeePunch = async (uid, punchId, updatedData) => {

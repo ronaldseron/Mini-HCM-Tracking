@@ -11,7 +11,7 @@ export function timeToDecimal(timeString) {
 
 export function getMondayAndFridayKeys() {
   const today = new Date();
-  const day = today.getDay(); // 0 = Sunday, 1 = Monday, ...
+  const day = today.getDay();
   const monday = new Date(today);
   const friday = new Date(today);
 

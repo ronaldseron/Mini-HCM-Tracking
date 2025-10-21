@@ -15,7 +15,6 @@ export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd, time
     };
   }
 
-  // Use current time in user's timezone if no timeOut
   let tOut;
   if (timeOut) {
     tOut = timeToDecimal(timeOut);
@@ -34,10 +33,10 @@ export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd, time
   // Late in hours
   const lateHours = Math.max(0, tIn - sStart);
 
-  // If timeOut is missing → calculate only regular and late
+  // Without Timeout
   if (!timeOut) {
     const hoursWorkedSoFar = Math.max(0, tOut - tIn);
-    const regularHours = Math.min(hoursWorkedSoFar, sEnd - sStart);
+    const regularHours = Math.max(0, Math.min(tOut, sEnd) - Math.max(tIn, sStart));
 
     return {
       regular: regularHours.toFixed(6),
@@ -48,13 +47,13 @@ export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd, time
     };
   }
 
-  // If timeOut exists → compute all metrics
-  const workedHours = Math.max(0, tOut - tIn);
-  const regularHours = Math.min(workedHours, sEnd - sStart);
-  const overtimeHours = tOut > sEnd ? tOut - sEnd : 0;
-  const undertimeHours = tOut < sEnd ? sEnd - tOut : 0;
+  // Regular hours
+  const regularHours = Math.max(0, Math.min(tOut, sEnd) - Math.max(tIn, sStart));
 
-  // Night differential (22:00–06:00)
+  const overtimeHours = Math.max(0, tOut - sEnd);
+  const undertimeHours = Math.max(0, sEnd - tOut);
+
+  // Night differential
   const nightStart = 22;
   const nightEnd = 6;
   let ndHours = 0;

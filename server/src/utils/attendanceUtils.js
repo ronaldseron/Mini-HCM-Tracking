@@ -1,21 +1,24 @@
 import { timeToDecimal } from "./timeUtils.js";
 
-export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd) {
+export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd, timezone) {
   const tIn = timeToDecimal(timeIn);
   const sStart = timeToDecimal(schedStart);
   const sEnd = timeToDecimal(schedEnd);
 
-  console.log({ timeIn, timeOut, sStart, sEnd });
-  console.log("T", { tIn, timeOut, sStart, sEnd });
+  const current = new Date().toLocaleString("en-US", { timeZone: timezone });
+  const [hours, minutes, seconds] = current
+    .split(", ")[1] 
+    .split(":")
+    .map(Number);
 
-  // Use current time if no timeOut
-  const current = new Date();
-  const currentDecimal =
-    current.getHours() + current.getMinutes() / 60 + current.getSeconds() / 3600;
+  // Convert to 24-hour decimal
+  let h = hours;
+  if (current.includes("PM") && h < 12) h += 12;
+  if (current.includes("AM") && h === 12) h = 0;
+  const currentDecimal = h + minutes / 60 + (seconds || 0) / 3600;
 
   const tOut = timeOut ? timeToDecimal(timeOut) : currentDecimal;
 
-  // Guard invalid times
   if (!tIn || !sStart || !sEnd) {
     return {
       regularHours: "0.00",
@@ -26,10 +29,8 @@ export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd) {
     };
   }
 
-  // Late (in minutes)
-  const lateMinutes = Math.max(0, (tIn - sStart));
+  const lateMinutes = Math.max(0, tIn - sStart);
 
-  // If timeOut missing → only compute late & regular so far
   if (!timeOut) {
     const hoursWorkedSoFar = Math.max(0, tOut - tIn);
     const regularHours = Math.min(hoursWorkedSoFar, sEnd - sStart);
@@ -43,13 +44,13 @@ export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd) {
     };
   }
 
-  // If timeOut exists → compute all metrics
+  // Calulate all metrics
   const workedHours = Math.max(0, tOut - tIn);
   const regularHours = Math.min(workedHours, sEnd - sStart);
   const overtimeHours = Math.max(0, tOut - sEnd);
   const undertimeHours = Math.max(0, sEnd - tOut);
 
-  // Night Differential (22:00–06:00)
+  // Night Differential
   const nightStart = 22;
   const nightEnd = 6;
   let ndHours = 0;

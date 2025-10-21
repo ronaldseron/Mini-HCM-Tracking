@@ -1,5 +1,6 @@
 import * as AdminService from "../services/admin.js";
-import { formatTimeWithMeridiem, formatDate, decimalToHMS, formatPunch, formatUserSummary } from "../utils/formatUtils.js";
+import * as UserRepo from "../repositories/user.js";
+import { formatPunch, formatUserSummary } from "../utils/formatUtils.js";
 
 export const allEmployees = async (req, res) => {
   try {
@@ -25,6 +26,8 @@ export const employeePunches = async (req, res) => {
   try {
     const { uid } = req.params;
     const punches = await AdminService.getEmployeePunches(uid);
+    const user = await UserRepo.getUserByUid(uid);
+    const timezone = user?.timezone;
 
     if (!punches || punches.length === 0) {
       return res.status(404).json({
@@ -33,7 +36,7 @@ export const employeePunches = async (req, res) => {
       });
     }
 
-    const formatted = punches.map(formatPunch);
+    const formatted = punches.map((punch) => formatPunch(punch, timezone));
 
     return res.status(200).json({
       success: true,

@@ -5,11 +5,14 @@ export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd, time
   const sStart = timeToDecimal(schedStart);
   const sEnd = timeToDecimal(schedEnd);
 
+  console.log("Current Timezone:", timezone);
   const current = new Date().toLocaleString("en-US", { timeZone: timezone });
   const [hours, minutes, seconds] = current
     .split(", ")[1] 
     .split(":")
     .map(Number);
+  console.log("Current:", current);
+
 
   // Convert to 24-hour decimal
   let h = hours;
@@ -34,7 +37,7 @@ export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd, time
   if (!timeOut) {
     const hoursWorkedSoFar = Math.max(0, tOut - tIn);
     const regularHours = Math.min(hoursWorkedSoFar, sEnd - sStart);
-
+    console.log("Regular Hours (no timeOut):", regularHours);
     return {
       regular: regularHours.toFixed(6),
       overtime: "0.00",

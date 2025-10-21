@@ -7,7 +7,7 @@ export const getMetricsStatus = async (attendanceData) => {
   const schedStart = attendanceData.schedule.start;
   const schedEnd = attendanceData.schedule.end;
 
-  const metrics = calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd);
+  const metrics = calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd, attendanceData.timezone);
 
   return metrics;
 };

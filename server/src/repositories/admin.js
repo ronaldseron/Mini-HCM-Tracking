@@ -48,7 +48,7 @@ export const fetchEmployeePunches = async (uid) => {
   return punches;
 };
 
-export const updateEmployeePunch = async (punchId, updatedData) => {
+export const updateEmployeePunch = async (uid, punchId, updatedData) => {
   const docRef = attendanceCollection.doc(punchId);
   const docSnap = await docRef.get();
   if (!docSnap.exists) return null;

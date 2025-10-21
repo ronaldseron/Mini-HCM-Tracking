@@ -6,6 +6,7 @@ import {
 } from "../config/db.js";
 import { dateKey, getMondayAndFridayKeys } from "../utils/timeUtils.js";
 import { toTimestamp } from "../utils/formatUtils.js";
+import * as UserRepo from "../repositories/user.js";
 
 export const totalEmployees = async () => {
   const users = await usersCollection.where("role", "==", "employee").get();
@@ -50,15 +51,17 @@ export const fetchEmployeePunches = async (uid) => {
 export const updateEmployeePunch = async (punchId, updatedData) => {
   const docRef = attendanceCollection.doc(punchId);
   const docSnap = await docRef.get();
-  if (!docSnap.exists) return { message: "Punch record not found!" };
+  if (!docSnap.exists) return null;
   const baseDate = docSnap.data().createdAt.toDate();
+  const user = await UserRepo.getUserByUid(uid);
+  const timezone = user?.timezone;
 
   const updatedFields = {
     ...(updatedData.timeIn && {
-      timeIn: toTimestamp(updatedData.timeIn, baseDate, admin),
+      timeIn: toTimestamp(updatedData.timeIn, baseDate, admin, timezone),
     }),
     ...(updatedData.timeOut && {
-      timeOut: toTimestamp(updatedData.timeOut, baseDate, admin),
+      timeOut: toTimestamp(updatedData.timeOut, baseDate, admin, timezone),
     }),
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   };
@@ -75,7 +78,8 @@ export const fetchEmployeeAttendanceById = async (uid, punchId) => {
   const userSnap = await usersCollection.doc(uid).get();
   return {
     data: punchSnap.data(),
-    schedule: userSnap.data()?.schedule || null,
+    schedule: userSnap.data()?.schedule,
+    timezone: userSnap.data()?.timezone,
   };
 };
 

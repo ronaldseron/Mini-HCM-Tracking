@@ -1,11 +1,9 @@
 import admin from "../config/firebase.js";
 import { dailySummaryCollection } from "../config/db.js";
-import { dateKey } from "../utils/timeUtils.js";
-
-const date = dateKey();
+import * as UserRepo from "../repositories/user.js";
 
 export const createDailySummary = async (uid, todayMetrics) => {
-  const docId = `${uid}_${date}`;
+  const docId = UserRepo.createDateKey(uid);
   const docRef = dailySummaryCollection.doc(docId);
 
   await docRef.set({

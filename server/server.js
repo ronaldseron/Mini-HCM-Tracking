@@ -17,6 +17,6 @@ app.use(express.json());
 app.use(verifyToken);
 app.use('/api', allRoutes); 
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
 });

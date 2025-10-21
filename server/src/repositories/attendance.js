@@ -4,6 +4,7 @@ import * as UserRepo from "../repositories/user.js";
 
 export const getAttendanceByUserAndDate = async (uid) => {
     const docId = UserRepo.createDateKey(uid);
+    console.log("Attendance Doc ID:", docId);
     const docRef = attendanceCollection.doc(docId);
     const snapshot = await docRef.get();
 

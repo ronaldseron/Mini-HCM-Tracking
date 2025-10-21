@@ -6,29 +6,35 @@ export const toDate = (timestamp) => {
 export const toTimestamp = (timeStr, baseDate, admin, timezone) => {
   if (!timeStr) return null;
 
-  // Parse input time (e.g., "01:23:45 PM")
+  // Parse input time (e.g. "09:00:00 AM")
   const [time, modifier] = timeStr.split(" ");
   let [h, m, s] = time.split(":").map(Number);
   if (modifier === "PM" && h < 12) h += 12;
   if (modifier === "AM" && h === 12) h = 0;
 
-  // Get base date components in user's timezone
-  const tzDateStr = baseDate.toLocaleString("en-US", { timeZone: timezone });
-  const tzDate = new Date(tzDateStr); // This is now the date in the user's TZ
-  const year = tzDate.getFullYear();
-  const month = tzDate.getMonth(); // 0-indexed
-  const day = tzDate.getDate();
+  // Extract user's date components from timezone (only the DATE part matters)
+  const dateInTZ = new Date(
+    baseDate.toLocaleString("en-US", { timeZone: timezone })
+  );
+  const year = dateInTZ.getFullYear();
+  const month = dateInTZ.getMonth();
+  const day = dateInTZ.getDate();
 
-  console.log("tzDateStr:", tzDateStr);
+  // Build a new date as if user typed time in their local TZ
+  // This date is *interpreted* as UTC initially
+  const localDate = new Date(Date.UTC(year, month, day, h, m, s || 0));
 
-  // Build date in user's timezone
-  const userTZDate = new Date(Date.UTC(year, month, day, h, m, s || 0));
+  // Compute Manila offset and correct to true UTC time
+  const options = { timeZone: timezone };
+  const utcMillis =
+    localDate.getTime() -
+    (new Date(localDate.toLocaleString("en-US", options)).getTime() -
+      localDate.getTime());
 
-  // Convert it to UTC Firestore timestamp
-  return admin.firestore.Timestamp.fromDate(userTZDate);
+  const adjustedDate = new Date(utcMillis);
+
+  return admin.firestore.Timestamp.fromDate(adjustedDate);
 };
-
-
 
 
 export const formatDate = (timestamp, timezone) => {

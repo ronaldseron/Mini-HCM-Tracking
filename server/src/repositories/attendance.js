@@ -3,8 +3,7 @@ import { attendanceCollection } from "../config/db.js";
 import * as UserRepo from "../repositories/user.js";
 
 export const getAttendanceByUserAndDate = async (uid) => {
-    const docId = UserRepo.createDateKey(uid);
-    console.log("Attendance Doc ID:", docId);
+    const docId = await UserRepo.createDateKey(uid);
     const docRef = attendanceCollection.doc(docId);
     const snapshot = await docRef.get();
 
@@ -12,7 +11,7 @@ export const getAttendanceByUserAndDate = async (uid) => {
 };
 
 export const createAttendance = async (uid) => {
-    const docId = UserRepo.createDateKey(uid);
+    const docId = await UserRepo.createDateKey(uid);
     const docRef = attendanceCollection.doc(docId);
 
     await docRef.set({
@@ -27,7 +26,7 @@ export const createAttendance = async (uid) => {
 }
 
 export const updateAttendance = async (uid, updateData) => {
-    const docId = UserRepo.createDateKey(uid);
+    const docId = await UserRepo.createDateKey(uid);
     const docRef = attendanceCollection.doc(docId);
 
     await docRef.update({

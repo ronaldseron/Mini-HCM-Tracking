@@ -11,11 +11,21 @@ export const toTimestamp = (timeStr, baseDate, admin, timezone) => {
   if (modifier === "PM" && h < 12) h += 12;
   if (modifier === "AM" && h === 12) h = 0;
 
-  const base = new Date(baseDate.toLocaleString("en-US", { timeZone: timezone }));
-  base.setHours(h, m, s || 0, 0);
+  const baseParts = new Date(baseDate).toLocaleDateString("en-US", { timeZone: timezone })
+    .split("/")
+    .map(Number);
+  const year = baseParts[2];
+  const month = baseParts[0] - 1;
+  const day = baseParts[1];
 
-  return admin.firestore.Timestamp.fromDate(base);
+  const userTZDate = new Date(year, month, day, h, m, s || 0);
+
+  //UTC for Firestore
+  const utcDate = new Date(userTZDate.getTime() - userTZDate.getTimezoneOffset() * 60000);
+
+  return admin.firestore.Timestamp.fromDate(utcDate);
 };
+
 
 
 export const formatDate = (timestamp, timezone) => {

@@ -5,69 +5,51 @@ export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd, time
   const sStart = timeToDecimal(schedStart);
   const sEnd = timeToDecimal(schedEnd);
 
-  console.log("Current Timezone:", timezone);
-  const current = new Date().toLocaleString("en-US", { timeZone: timezone });
-  const [hours, minutes, seconds] = current
-    .split(", ")[1] 
-    .split(":")
-    .map(Number);
-  console.log("Current:", current);
-
-
-  // Convert to 24-hour decimal
-  let h = hours;
-  if (current.includes("PM") && h < 12) h += 12;
-  if (current.includes("AM") && h === 12) h = 0;
-  const currentDecimal = h + minutes / 60 + (seconds || 0) / 3600;
-
-  const tOut = timeOut ? timeToDecimal(timeOut) : currentDecimal;
-
   if (!tIn || !sStart || !sEnd) {
     return {
-      regularHours: "0.00",
-      overtimeHours: "0.00",
-      undertimeHours: "0.00",
-      lateMinutes: "0",
-      nightDifferentialHours: "0.00",
-    };
-  }
-
-  const lateMinutes = Math.max(0, tIn - sStart);
-
-  if (!timeOut) {
-    const hoursWorkedSoFar = Math.max(0, tOut - tIn);
-    const regularHours = Math.min(hoursWorkedSoFar, sEnd - sStart);
-    console.log("Regular Hours (no timeOut):", regularHours);
-    return {
-      regular: regularHours.toFixed(6),
+      regular: "0.00",
       overtime: "0.00",
       undertime: "0.00",
-      late: lateMinutes.toFixed(6),
+      late: "0.00",
       nightDifferential: "0.00",
     };
   }
 
-  // Calulate all metrics
-  const workedHours = Math.max(0, tOut - tIn);
-  const regularHours = Math.min(workedHours, sEnd - sStart);
-  const overtimeHours = Math.max(0, tOut - sEnd);
-  const undertimeHours = Math.max(0, sEnd - tOut);
+  // Use current time in user's timezone if no timeOut
+  let tOut;
+  if (timeOut) {
+    tOut = timeToDecimal(timeOut);
+  } else {
+    const now = new Date().toLocaleTimeString("en-US", {
+      hour12: false,
+      timeZone: timezone,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+    const [h, m, s] = now.split(":").map(Number);
+    tOut = h + m / 60 + s / 3600;
+  }
 
-  // Night Differential
+  const lateHours = Math.max(0, tIn - sStart);
+  const workedHours = Math.max(0, tOut - tIn);
+
+  const regularHours = Math.min(workedHours, sEnd - sStart);
+  const overtimeHours = tOut > sEnd ? tOut - sEnd : 0;
+  const undertimeHours = tOut < sEnd ? sEnd - tOut : 0;
+
+  // Night differential (22:00–06:00)
   const nightStart = 22;
   const nightEnd = 6;
   let ndHours = 0;
-
-  if (tOut > nightStart || tIn < nightEnd) {
-    if (tOut > nightStart) ndHours += Math.max(0, Math.min(tOut, 24) - nightStart);
-    if (tIn < nightEnd) ndHours += Math.max(0, nightEnd - tIn);
-  }
+  if (tOut > nightStart) ndHours += Math.min(tOut, 24) - nightStart;
+  if (tIn < nightEnd) ndHours += nightEnd - Math.max(tIn, 0);
 
   return {
     regular: regularHours.toFixed(6),
     overtime: overtimeHours.toFixed(6),
     undertime: undertimeHours.toFixed(6),
-    late: lateMinutes.toFixed(6),
+    late: lateHours.toFixed(6),
     nightDifferential: ndHours.toFixed(6),
   };
 }

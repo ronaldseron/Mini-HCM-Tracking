@@ -3,7 +3,7 @@ import { dailySummaryCollection } from "../config/db.js";
 import * as UserRepo from "../repositories/user.js";
 
 export const createDailySummary = async (uid, todayMetrics) => {
-  const docId = UserRepo.createDateKey(uid);
+  const docId = await UserRepo.createDateKey(uid);
   const docRef = dailySummaryCollection.doc(docId);
 
   await docRef.set({

@@ -34,7 +34,7 @@ export const formatTimeWithMeridiem = (timestamp, timezone) => {
     minute: "2-digit",
     second: "2-digit",
     hour12: true,
-    timezone: timezone
+    timeZone: timezone
   });
 };
 
@@ -46,7 +46,7 @@ export const formatTimeWithoutMeridiem = (timestamp, timzezone) => {
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
-    timezone: timzezone
+    timeZone: timzezone
   });
 };
 

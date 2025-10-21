@@ -15,17 +15,18 @@ export const toTimestamp = (timeStr, baseDate, admin) => {
   return admin.firestore.Timestamp.fromDate(d);
 };
 
-export const formatDate = (timestamp) => {
+export const formatDate = (timestamp, timezone) => {
   const date = toDate(timestamp);
   if (!date) return "—";
   return date.toLocaleDateString("en-US", {
     month: "short",
     day: "2-digit",
     year: "numeric",
+    timezone: timezone
   });
 };
 
-export const formatTimeWithMeridiem = (timestamp) => {
+export const formatTimeWithMeridiem = (timestamp, timezone) => {
   const date = toDate(timestamp);
   if (!date) return "—";
   return date.toLocaleTimeString("en-US", {
@@ -33,10 +34,11 @@ export const formatTimeWithMeridiem = (timestamp) => {
     minute: "2-digit",
     second: "2-digit",
     hour12: true,
+    timzezone: timezone
   });
 };
 
-export const formatTimeWithoutMeridiem = (timestamp) => {
+export const formatTimeWithoutMeridiem = (timestamp, timzezone) => {
   const date = toDate(timestamp);
   if (!date) return "—";
   return date.toLocaleTimeString("en-US", {
@@ -44,6 +46,7 @@ export const formatTimeWithoutMeridiem = (timestamp) => {
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
+    timezone: timzezone
   });
 };
 
@@ -66,11 +69,11 @@ export function convertMetricsToHMS(metrics) {
   return result;
 }
 
-export const formatPunch = (punch) => ({
+export const formatPunch = (punch, timzezone) => ({
   id: punch.id,
-  timeIn: formatTimeWithMeridiem(punch.timeIn),
-  timeOut: punch.timeOut ? formatTimeWithMeridiem(punch.timeOut) : null,
-  date: formatDate(punch.createdAt),
+  timeIn: formatTimeWithMeridiem(punch.timeIn, timzezone),
+  timeOut: punch.timeOut ? formatTimeWithMeridiem(punch.timeOut, timzezone) : null,
+  date: formatDate(punch.createdAt, timzezone),
 });
 
 export const formatUserSummary = (user) => {

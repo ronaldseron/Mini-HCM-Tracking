@@ -3,17 +3,20 @@ export const toDate = (timestamp) => {
   return new Date(timestamp._seconds * 1000 + timestamp._nanoseconds / 1e6);
 };
 
-export const toTimestamp = (timeStr, baseDate, admin) => {
-  console.log("BaseDate:", baseDate);
+export const toTimestamp = (timeStr, baseDate, admin, timezone) => {
   if (!timeStr) return null;
+
   const [time, modifier] = timeStr.split(" ");
   let [h, m, s] = time.split(":").map(Number);
   if (modifier === "PM" && h < 12) h += 12;
   if (modifier === "AM" && h === 12) h = 0;
-  const d = new Date(baseDate);
-  d.setHours(h, m, s || 0, 0);
-  return admin.firestore.Timestamp.fromDate(d);
+
+  const base = new Date(baseDate.toLocaleString("en-US", { timeZone: timezone }));
+  base.setHours(h, m, s || 0, 0);
+
+  return admin.firestore.Timestamp.fromDate(base);
 };
+
 
 export const formatDate = (timestamp, timezone) => {
   const date = toDate(timestamp);

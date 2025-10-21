@@ -5,6 +5,9 @@ export function calculateWorkMetrics(timeIn, timeOut, schedStart, schedEnd) {
   const sStart = timeToDecimal(schedStart);
   const sEnd = timeToDecimal(schedEnd);
 
+  console.log({ tIn, timeOut, sStart, sEnd });
+  console.log("T", { tIn, timeOut, sStart, sEnd });
+
   // Use current time if no timeOut
   const current = new Date();
   const currentDecimal =

@@ -22,7 +22,7 @@ export const formatDate = (timestamp, timezone) => {
     month: "short",
     day: "2-digit",
     year: "numeric",
-    timezone: timezone
+    timeZone: timezone
   });
 };
 
@@ -38,7 +38,7 @@ export const formatTimeWithMeridiem = (timestamp, timezone) => {
   });
 };
 
-export const formatTimeWithoutMeridiem = (timestamp, timzezone) => {
+export const formatTimeWithoutMeridiem = (timestamp, timezone) => {
   const date = toDate(timestamp);
   if (!date) return "—";
   return date.toLocaleTimeString("en-US", {
@@ -46,7 +46,7 @@ export const formatTimeWithoutMeridiem = (timestamp, timzezone) => {
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
-    timeZone: timzezone
+    timeZone: timezone
   });
 };
 
@@ -69,11 +69,11 @@ export function convertMetricsToHMS(metrics) {
   return result;
 }
 
-export const formatPunch = (punch, timzezone) => ({
+export const formatPunch = (punch, timezone) => ({
   id: punch.id,
-  timeIn: formatTimeWithMeridiem(punch.timeIn, timzezone),
-  timeOut: punch.timeOut ? formatTimeWithMeridiem(punch.timeOut, timzezone) : null,
-  date: formatDate(punch.createdAt, timzezone),
+  timeIn: formatTimeWithMeridiem(punch.timeIn, timezone),
+  timeOut: punch.timeOut ? formatTimeWithMeridiem(punch.timeOut, timezone) : null,
+  date: formatDate(punch.createdAt, timezone),
 });
 
 export const formatUserSummary = (user) => {
